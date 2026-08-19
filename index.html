@@ -3,221 +3,485 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>سازنده پرامپت</title>
+  <title>پرامپت‌ساز هوشمند</title>
+  
+  <!-- فونت وزیرمتن -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
   <style>
-    body {
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #a855f7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --input-border: rgba(255, 255, 255, 0.15);
+      --input-focus: #818cf8;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 24px;
-      font-family: Tahoma, Arial, sans-serif;
-      background: #f5f7fb;
-      color: #111827;
+      padding: 0;
+      font-family: 'Vazirmatn', -apple-system, sans-serif;
     }
-    .wrap {
-      max-width: 900px;
-      margin: 0 auto;
-      background: #fff;
-      border: 1px solid #e5e7eb;
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 900;
+      background: linear-gradient(to right, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* تب‌های حالت ساده و حرفه‌ای */
+    .tabs {
+      display: flex;
+      background: var(--input-bg);
+      padding: 4px;
       border-radius: 12px;
-      padding: 20px;
+      margin-bottom: 24px;
+      border: 1px solid var(--input-border);
     }
-    h1 { margin-top: 0; font-size: 28px; }
-    label { display: block; margin: 14px 0 6px; font-weight: 700; }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    /* فرم‌ها */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #cbd5e1;
+    }
+
     input, textarea, select {
       width: 100%;
-      box-sizing: border-box;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 12px;
-      font: inherit;
-      background: #fff;
-    }
-    textarea { min-height: 100px; resize: vertical; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
-    button {
-      border: 0;
-      border-radius: 8px;
-      padding: 12px 16px;
-      background: #2563eb;
-      color: #fff;
-      font: inherit;
-      cursor: pointer;
-    }
-    button.secondary { background: #334155; }
-    button.ghost { background: #e5e7eb; color: #111827; }
-    pre {
-      white-space: pre-wrap;
-      word-break: break-word;
-      background: #0f172a;
-      color: #e2e8f0;
-      padding: 16px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
       border-radius: 10px;
-      min-height: 160px;
-      overflow: auto;
-    }
-    .hint {
-      color: #64748b;
+      padding: 12px 16px;
+      color: var(--text);
       font-size: 14px;
-      margin-top: 8px;
-      line-height: 1.7;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .container {
+        padding: 20px;
+      }
+    }
+
+    /* دکمه اصلی */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.95;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.99);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* بخش نتیجه */
+    .result-box {
+      margin-top: 28px;
+      display: none;
+    }
+
+    .result-box.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .result-header span {
+      font-size: 14px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .output-text {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 14px;
+      white-space: pre-wrap;
+      line-height: 1.8;
+      color: #e2e8f0;
+      max-height: 450px;
+      overflow-y: auto;
+    }
+
+    /* لودر */
+    .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>سازنده پرامپت حرفه‌ای</h1>
-    <p class="hint">کلید API و مدل را وارد کن. کلید در مرورگر ذخیره می‌شود.</p>
 
-    <div class="row">
-      <div>
-        <label for="apiKey">API Key</label>
-        <input id="apiKey" type="password" placeholder="sk-..." />
-      </div>
-      <div>
-        <label for="model">Model</label>
-        <input id="model" type="text" value="gpt-4.1-mini" />
+  <main class="container">
+    <header>
+      <h1>✨ دستیار ساخت پرامپت حرفه‌ای</h1>
+      <p>ایده‌ات را بنویس تا یک پرامپت ساختاریافته و آمادهٔ اجرا تحویل بگیری</p>
+    </header>
+
+    <!-- سوئیچ بین حالت‌ها -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tabSimple" onclick="switchTab('simple')">حالت ساده (فوری)</button>
+      <button class="tab-btn" id="tabPro" onclick="switchTab('pro')">حالت پیشرفته (شخصی‌سازی)</button>
+    </div>
+
+    <!-- فرم حالت ساده -->
+    <div id="simpleSection">
+      <div class="form-group">
+        <label for="simpleInput">می‌خواهی هوش مصنوعی برایت چه کاری انجام دهد؟</label>
+        <textarea id="simpleInput" placeholder="مثال: یک برنامه ورزشی یک‌ماهه لاغری برای فرد پشت‌میز‌نشین بنویس"></textarea>
       </div>
     </div>
 
-    <label for="goal">هدف اصلی</label>
-    <textarea id="goal" placeholder="مثلاً: یک پرامپت عالی برای ساخت مقاله آموزشی بنویس"></textarea>
-
-    <div class="row">
-      <div>
-        <label for="audience">مخاطب</label>
-        <input id="audience" placeholder="مثلاً: مبتدی‌ها" />
+    <!-- فرم حالت پیشرفته -->
+    <div id="proSection" class="hidden">
+      <div class="form-group">
+        <label for="proGoal">موضوع یا هدف اصلی *</label>
+        <textarea id="proGoal" placeholder="هدف اصلی پرامپت را کامل شرح بده..."></textarea>
       </div>
-      <div>
-        <label for="tone">لحن</label>
-        <input id="tone" placeholder="مثلاً: رسمی، دوستانه، آموزشی" />
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="proAudience">مخاطب هدف</label>
+          <input id="proAudience" type="text" placeholder="مثلاً: برنامه‌نویسان مبتدی، دانش‌آموزان" />
+        </div>
+        <div class="form-group">
+          <label for="proTone">لحن پاسخ</label>
+          <input id="proTone" type="text" placeholder="مثلاً: آموزشی و صمیمی، رسمی و آکادمیک" />
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="proLang">زبان خروجی</label>
+          <select id="proLang">
+            <option value="فارسی" selected>فارسی</option>
+            <option value="انگلیسی">انگلیسی (English)</option>
+            <option value="عربی">عربی</option>
+            <option value="دوزبانه (فارسی و انگلیسی)">دوزبانه (فارسی و انگلیسی)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="proFormat">قالب خروجی</label>
+          <input id="proFormat" type="text" placeholder="مثلاً: جدول، بولت‌پوینت، مقاله، کد پایتون" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="proConstraints">محدودیت‌ها یا شرایط خاص</label>
+        <input id="proConstraints" type="text" placeholder="مثلاً: بدون مقدمه‌چینی، حداکثر ۵۰۰ کلمه، مرحله‌به‌مرحله" />
       </div>
     </div>
 
-    <div class="row">
-      <div>
-        <label for="format">فرمت خروجی</label>
-        <input id="format" placeholder="مثلاً: مقاله، جدول، لیست" />
+    <!-- دکمه ساخت -->
+    <button class="btn-submit" id="submitBtn" onclick="generatePrompt()">
+      <span class="spinner" id="loader"></span>
+      <span id="btnText">ساخت پرامپت طلایی</span>
+    </button>
+
+    <!-- کادر خروجی -->
+    <div class="result-box" id="resultContainer">
+      <div class="result-header">
+        <span>📋 پرامپت آماده‌شده:</span>
+        <button class="btn-copy" id="copyBtn" onclick="copyResult()">کپی پرامپت</button>
       </div>
-      <div>
-        <label for="lang">زبان خروجی</label>
-        <input id="lang" value="فارسی" />
-      </div>
+      <div class="output-text" id="outputContent"></div>
     </div>
-
-    <label for="constraints">محدودیت‌ها / جزئیات</label>
-    <textarea id="constraints" placeholder="مثلاً: حداکثر 700 کلمه، همراه مثال، بدون حاشیه"></textarea>
-
-    <div class="actions">
-      <button id="saveBtn" class="ghost">ذخیره کلید</button>
-      <button id="runBtn">ساخت پرامپت</button>
-      <button id="copyBtn" class="secondary">کپی خروجی</button>
-      <button id="clearBtn" class="ghost">پاک‌کردن کلید</button>
-    </div>
-
-    <p class="hint" id="status"></p>
-    <pre id="output">خروجی اینجا نمایش داده می‌شود.</pre>
   </main>
 
   <script>
+    // تنظیمات API
+    const API_KEY = "sk-ExsZq0gOhkNFHVdCsEDnQcChuLS2ne0vEBZf0nNWKKd7e8kC";
     const BASE_URL = "https://api.gapgpt.app/v1";
+    const MODEL = "gpt-4.1-mini";
 
-    const $ = (id) => document.getElementById(id);
+    let currentMode = "simple";
 
-    function setStatus(text) {
-      $("status").textContent = text;
-    }
+    function switchTab(mode) {
+      currentMode = mode;
+      const tabSimple = document.getElementById("tabSimple");
+      const tabPro = document.getElementById("tabPro");
+      const simpleSection = document.getElementById("simpleSection");
+      const proSection = document.getElementById("proSection");
 
-    function loadKey() {
-      const saved = localStorage.getItem("gapgpt_api_key");
-      if (saved) $("apiKey").value = saved;
-    }
-
-    $("saveBtn").addEventListener("click", () => {
-      const key = $("apiKey").value.trim();
-      if (!key) {
-        setStatus("کلید خالی است.");
-        return;
+      if (mode === "simple") {
+        tabSimple.classList.add("active");
+        tabPro.classList.remove("active");
+        simpleSection.classList.remove("hidden");
+        proSection.classList.add("hidden");
+      } else {
+        tabPro.classList.add("active");
+        tabSimple.classList.remove("active");
+        proSection.classList.remove("hidden");
+        simpleSection.classList.add("hidden");
       }
-      localStorage.setItem("gapgpt_api_key", key);
-      setStatus("کلید ذخیره شد.");
-    });
+    }
 
-    $("clearBtn").addEventListener("click", () => {
-      localStorage.removeItem("gapgpt_api_key");
-      $("apiKey").value = "";
-      setStatus("کلید پاک شد.");
-    });
+    async function generatePrompt() {
+      const submitBtn = document.getElementById("submitBtn");
+      const btnText = document.getElementById("btnText");
+      const loader = document.getElementById("loader");
+      const resultBox = document.getElementById("resultContainer");
+      const output = document.getElementById("outputContent");
 
-    $("copyBtn").addEventListener("click", async () => {
-      const text = $("output").textContent;
-      await navigator.clipboard.writeText(text);
-      setStatus("خروجی کپی شد.");
-    });
+      let systemPrompt = "";
+      let userPrompt = "";
 
-    $("runBtn").addEventListener("click", async () => {
-      const apiKey = $("apiKey").value.trim();
-      const goal = $("goal").value.trim();
+      if (currentMode === "simple") {
+        const text = document.getElementById("simpleInput").value.trim();
+        if (!text) {
+          alert("لطفاً ابتدا درخواست خود را وارد کنید.");
+          return;
+        }
 
-      if (!apiKey) return setStatus("کلید API را وارد کن.");
-      if (!goal) return setStatus("هدف اصلی را وارد کن.");
+        systemPrompt = `تو یک مهندس پرامپت فوق‌حرفه‌ای هستی. وظیفه تو این است که یک ایده خام را از کاربر بگیری و آن را به یک پرامپت کامل، باکیفیت و آماده اجرا برای مدل‌های هوش مصنوعی تبدیل کنی.
+پرامپت نهایی باید دارای ساختار زیر باشد:
+1. تعیین نقش (Role)
+2. زمینه و هدف (Context & Goal)
+3. دستورالعمل دقیق گام‌به‌گام (Instructions)
+4. لحن و سبک پاسخ (Tone)
+5. قالب و فرمت خروجی (Output Format)
+6. محدودیت‌ها و نبایدها (Constraints)
 
-      localStorage.setItem("gapgpt_api_key", apiKey);
-      $("output").textContent = "در حال ساخت پرامپت...";
-      setStatus("در حال ارسال درخواست...");
+فقط و فقط متن نهایی پرامپت را بنویس و هیچ توضیح اضافی یا مقدمه نده. زبان پرامپت فارسی روان باشد.`;
 
-      const systemPrompt = `
-تو یک متخصص مهندسی پرامپت هستی.
-وظیفه‌ات این است که ورودی خام کاربر را به یک پرامپت حرفه‌ای، دقیق، واضح و قابل استفاده تبدیل کنی.
-فقط خود پرامپت نهایی را به فارسی برگردان. توضیح اضافه نده.
-اگر اطلاعات ناقص بود، پرامپت را طوری بنویس که جای خالی‌ها مشخص باشد.
-`;
+        userPrompt = `ایده خام من این است:\n"${text}"\nلطفاً آن را به یک پرامپت جامع و حرفه‌ای تبدیل کن.`;
 
-      const userPrompt = `
-هدف: ${goal}
-مخاطب: ${$("audience").value.trim() || "مشخص نشده"}
-لحن: ${$("tone").value.trim() || "مشخص نشده"}
-فرمت خروجی: ${$("format").value.trim() || "مشخص نشده"}
-زبان خروجی: ${$("lang").value.trim() || "فارسی"}
-محدودیت‌ها: ${$("constraints").value.trim() || "مشخص نشده"}
-`;
+      } else {
+        const goal = document.getElementById("proGoal").value.trim();
+        if (!goal) {
+          alert("لطفاً موضوع یا هدف اصلی را وارد کنید.");
+          return;
+        }
+
+        const audience = document.getElementById("proAudience").value.trim() || "عمومی / متناسب با موضوع";
+        const tone = document.getElementById("proTone").value.trim() || "حرفه‌ای، رسا و شفاف";
+        const lang = document.getElementById("proLang").value;
+        const format = document.getElementById("proFormat").value.trim() || "ساختاریافته و تمیز";
+        const constraints = document.getElementById("proConstraints").value.trim() || "رعایت بالاترین استاندارد کیفیت";
+
+        systemPrompt = `تو یک مهندس پرامپت ارشد هستی. بر اساس متغیرهایی که کاربر به تو می‌دهد، یک پرامپت بی‌نقص، مهندسی‌شده و ساختاریافته طراحی کن.
+پرامپت باید طوری باشد که وقتی به یک مدل هوش مصنوعی داده شد، دقیق‌ترین خروجی ممکن را تولید کند.
+فقط متن پرامپت نهایی را خروجی بده بدون هیچ‌گونه پیام مقدماتی یا توضیحات اضافه.`;
+
+        userPrompt = `لطفاً با این مشخصات یک پرامپت بساز:
+- هدف اصلی: ${goal}
+- مخاطب هدف: ${audience}
+- لحن: ${tone}
+- زبان پاسخ: ${lang}
+- فرمت خروجی: ${format}
+- محدودیت‌ها و شرایط: ${constraints}`;
+      }
+
+      // وضعیت لودینگ
+      submitBtn.disabled = true;
+      loader.style.display = "inline-block";
+      btnText.textContent = "در حال پردازش و مهندسی پرامپت...";
 
       try {
-        const res = await fetch(`${BASE_URL}/chat/completions`, {
+        const response = await fetch(`${BASE_URL}/chat/completions`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
+            "Authorization": `Bearer ${API_KEY}`
           },
           body: JSON.stringify({
-            model: $("model").value.trim() || "gpt-4.1-mini",
+            model: MODEL,
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt }
             ],
-            temperature: 0.4
+            temperature: 0.5
           })
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        if (!res.ok) {
-          throw new Error(data?.error?.message || data?.detail || "خطای نامشخص");
+        if (!response.ok) {
+          throw new Error(data?.error?.message || "خطا در ارتباط با سرور");
         }
 
-        const text =
-          data?.choices?.[0]?.message?.content ||
-          data?.output_text ||
-          JSON.stringify(data, null, 2);
+        const finalResult = data.choices?.[0]?.message?.content || "پاسخی دریافت نشد.";
+        output.textContent = finalResult;
+        resultBox.classList.add("show");
+        resultBox.scrollIntoView({ behavior: 'smooth' });
 
-        $("output").textContent = text;
-        setStatus("پرامپت ساخته شد.");
       } catch (err) {
-        $("output").textContent = "خطا: " + err.message;
-        setStatus("درخواست ناموفق بود.");
+        output.textContent = "خطا در دریافت پاسخ: " + err.message;
+        resultBox.classList.add("show");
+      } finally {
+        submitBtn.disabled = false;
+        loader.style.display = "none";
+        btnText.textContent = "ساخت پرامپت طلایی";
       }
-    });
+    }
 
-    loadKey();
+    async function copyResult() {
+      const text = document.getElementById("outputContent").textContent;
+      const copyBtn = document.getElementById("copyBtn");
+      
+      if (!text) return;
+
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = "کپی شد! ✓";
+        setTimeout(() => {
+          copyBtn.textContent = "کپی پرامپت";
+        }, 2000);
+      } catch {
+        alert("کپی خودکار پشتیبانی نشد؛ لطفاً متن را دستی کپی کنید.");
+      }
+    }
   </script>
 </body>
 </html>
