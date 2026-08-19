@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>سازنده پرامپت</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f5f7fb;
+      color: #111827;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    h1 { margin-top: 0; font-size: 28px; }
+    label { display: block; margin: 14px 0 6px; font-weight: 700; }
+    input, textarea, select {
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px;
+      font: inherit;
+      background: #fff;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: #2563eb;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
+    button.secondary { background: #334155; }
+    button.ghost { background: #e5e7eb; color: #111827; }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 10px;
+      min-height: 160px;
+      overflow: auto;
+    }
+    .hint {
+      color: #64748b;
+      font-size: 14px;
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>سازنده پرامپت حرفه‌ای</h1>
+    <p class="hint">کلید API و مدل را وارد کن. کلید در مرورگر ذخیره می‌شود.</p>
+
+    <div class="row">
+      <div>
+        <label for="apiKey">API Key</label>
+        <input id="apiKey" type="password" placeholder="sk-..." />
+      </div>
+      <div>
+        <label for="model">Model</label>
+        <input id="model" type="text" value="gpt-4.1-mini" />
+      </div>
+    </div>
+
+    <label for="goal">هدف اصلی</label>
+    <textarea id="goal" placeholder="مثلاً: یک پرامپت عالی برای ساخت مقاله آموزشی بنویس"></textarea>
+
+    <div class="row">
+      <div>
+        <label for="audience">مخاطب</label>
+        <input id="audience" placeholder="مثلاً: مبتدی‌ها" />
+      </div>
+      <div>
+        <label for="tone">لحن</label>
+        <input id="tone" placeholder="مثلاً: رسمی، دوستانه، آموزشی" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="format">فرمت خروجی</label>
+        <input id="format" placeholder="مثلاً: مقاله، جدول، لیست" />
+      </div>
+      <div>
+        <label for="lang">زبان خروجی</label>
+        <input id="lang" value="فارسی" />
+      </div>
+    </div>
+
+    <label for="constraints">محدودیت‌ها / جزئیات</label>
+    <textarea id="constraints" placeholder="مثلاً: حداکثر 700 کلمه، همراه مثال، بدون حاشیه"></textarea>
+
+    <div class="actions">
+      <button id="saveBtn" class="ghost">ذخیره کلید</button>
+      <button id="runBtn">ساخت پرامپت</button>
+      <button id="copyBtn" class="secondary">کپی خروجی</button>
+      <button id="clearBtn" class="ghost">پاک‌کردن کلید</button>
+    </div>
+
+    <p class="hint" id="status"></p>
+    <pre id="output">خروجی اینجا نمایش داده می‌شود.</pre>
+  </main>
+
+  <script>
+    const BASE_URL = "https://api.gapgpt.app/v1";
+
+    const $ = (id) => document.getElementById(id);
+
+    function setStatus(text) {
+      $("status").textContent = text;
+    }
+
+    function loadKey() {
+      const saved = localStorage.getItem("gapgpt_api_key");
+      if (saved) $("apiKey").value = saved;
+    }
+
+    $("saveBtn").addEventListener("click", () => {
+      const key = $("apiKey").value.trim();
+      if (!key) {
+        setStatus("کلید خالی است.");
+        return;
+      }
+      localStorage.setItem("gapgpt_api_key", key);
+      setStatus("کلید ذخیره شد.");
+    });
+
+    $("clearBtn").addEventListener("click", () => {
+      localStorage.removeItem("gapgpt_api_key");
+      $("apiKey").value = "";
+      setStatus("کلید پاک شد.");
+    });
+
+    $("copyBtn").addEventListener("click", async () => {
+      const text = $("output").textContent;
+      await navigator.clipboard.writeText(text);
+      setStatus("خروجی کپی شد.");
+    });
+
+    $("runBtn").addEventListener("click", async () => {
+      const apiKey = $("apiKey").value.trim();
+      const goal = $("goal").value.trim();
+
+      if (!apiKey) return setStatus("کلید API را وارد کن.");
+      if (!goal) return setStatus("هدف اصلی را وارد کن.");
+
+      localStorage.setItem("gapgpt_api_key", apiKey);
+      $("output").textContent = "در حال ساخت پرامپت...";
+      setStatus("در حال ارسال درخواست...");
+
+      const systemPrompt = `
+تو یک متخصص مهندسی پرامپت هستی.
+وظیفه‌ات این است که ورودی خام کاربر را به یک پرامپت حرفه‌ای، دقیق، واضح و قابل استفاده تبدیل کنی.
+فقط خود پرامپت نهایی را به فارسی برگردان. توضیح اضافه نده.
+اگر اطلاعات ناقص بود، پرامپت را طوری بنویس که جای خالی‌ها مشخص باشد.
+`;
+
+      const userPrompt = `
+هدف: ${goal}
+مخاطب: ${$("audience").value.trim() || "مشخص نشده"}
+لحن: ${$("tone").value.trim() || "مشخص نشده"}
+فرمت خروجی: ${$("format").value.trim() || "مشخص نشده"}
+زبان خروجی: ${$("lang").value.trim() || "فارسی"}
+محدودیت‌ها: ${$("constraints").value.trim() || "مشخص نشده"}
+`;
+
+      try {
+        const res = await fetch(`${BASE_URL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: $("model").value.trim() || "gpt-4.1-mini",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt }
+            ],
+            temperature: 0.4
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data?.error?.message || data?.detail || "خطای نامشخص");
+        }
+
+        const text =
+          data?.choices?.[0]?.message?.content ||
+          data?.output_text ||
+          JSON.stringify(data, null, 2);
+
+        $("output").textContent = text;
+        setStatus("پرامپت ساخته شد.");
+      } catch (err) {
+        $("output").textContent = "خطا: " + err.message;
+        setStatus("درخواست ناموفق بود.");
+      }
+    });
+
+    loadKey();
+  </script>
+</body>
+</html>
